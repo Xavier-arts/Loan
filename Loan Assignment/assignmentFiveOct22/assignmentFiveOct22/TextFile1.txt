@@ -1,0 +1,56 @@
+/* Notes
+	-use if calcValues is not supposed to be used for the final payment
+	//monthly totals
+			if( timeMonths != 1){	//run as long as its not the total payment
+				calcValues( interest, balance, appliedPay, monthlyRate, 
+							monthlyPayment, timeMonths);
+			}
+
+			else{	//final month totals
+				interest = monthlyRate * balance;
+				monthlyPayment = balance + interest;
+				appliedPay = monthlyPayment - interest;
+
+				balance = balance - monthlyPayment + interest;
+			}
+
+	//openFile( loan, annualRate, timeYears, currentMonth);
+	//opens file data, and replaces variable values with the file data, one space must be between each variable in the file to properly run
+	//needs a loan/annualRate/time/currentMonth in months variable to fill with data from a text file
+	void openFile( double& inLoan, double& inAnnualRate, int& inTimeYears, int& inMonth)
+	{
+		char error;
+		//opens file D:\amort.txt to set three variables
+		ifstream inFile;
+		inFile.open("D:\\amort.txt");
+		inFile>>inLoan>>inAnnualRate>>inTimeYears>>inMonth;
+
+		if ( !inFile ) {
+			cerr << "File could not be opened.\nPress any key to continue...";	//close program if error
+			cin>>error;
+			exit(1);
+		}
+
+		inFile.close();
+		return;
+	}
+
+	//replace file data, replaces file data with the values stored in variables with a space between each variable
+	//needs a loan/annualRate/time/currentMonth in months variable to replace in textfile
+	void replaceFile( double& outLoan, double& outAnnualRate, int& outTimeYears, int& outMonth)
+	{
+		char error;
+		ofstream outFile;
+		outFile.open("D:\\amort.txt", ios::out);
+		outFile<<outLoan<<" "<<outAnnualRate<<" "<<outTimeYears<<" "<<outMonth;
+
+			if ( !outFile ) {
+				cerr << "File could not be opened.\nPress any key to continue...";	//close program if error
+				cin>>error;
+				exit(1);
+			}
+
+		outFile.close();
+		return;
+	}
+*/

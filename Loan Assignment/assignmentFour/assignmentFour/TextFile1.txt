@@ -1,0 +1,186 @@
+/*	
+	Ben Yoder
+	C++ AssignmentOne, Loan Payment
+	Explanation: Take user input and print out the users monthly payments for a loan
+	9/15/11
+*/
+
+#include<iostream>
+#include<iomanip>
+#include<cmath>
+#include<fstream>
+#include<string>
+#include <cstdlib>
+
+using namespace std;
+using std::cerr;
+using std::cout;
+using std::endl;
+
+void addFile();
+void replaceFile();
+
+int main()
+{
+	//initialize variables
+	int timeMonths,		//number of monthly payments
+		timeYears,		//number of years for payment
+		payNum= 0,			//payments
+		done;
+
+	double	loan,			//initial amount borrowed
+			annualRate,		//annual interest rate
+			monthlyRate,	//monthly interest rate
+			monthlyPayment,	//amount to pay monthly
+			totalPayment,	//total amount paid back
+			a,b,			//variables for calculations
+			interest= 0,		//currentinterest to be paid
+			balance= 0,		//currentBalance to be paid
+			appliedPay= 0;		//amount of payment applied to principle
+
+	char  answerOne,		//user input answer
+			answerTwo;
+
+
+
+	//input
+	cout<<"Would you like to open the file?(y/n)";
+	cin>>answerOne;
+
+	//opens file D:\amort.txt to set three variables
+	if ( answerOne == 'y'){
+		ifstream iFile;
+		iFile.open("D:\\amort.txt");
+		iFile>>loan>>annualRate>>timeYears;
+
+		if ( !iFile ) {
+			cerr << "File could not be opened.\n";	//close program if error
+			exit(1);
+		}
+
+		iFile.close();
+	}
+	//continue with input
+	else {	
+		cout<<"Enter amount borrowed: ";
+		cin>>loan;
+
+		cout<<"Enter annual interest rate(decimal format no sign): ";
+		cin>>annualRate;
+
+		cout<<"Enter number of years: ";
+		cin>>timeYears;
+
+		cout<<"Would you like to save the file?(y/n)";
+		cin>>answerTwo;
+		
+		//saves file if user says yes
+		if ( answerTwo == 'y'){
+			ofstream oFile;
+			oFile.open("D:\\amort.txt", ios::out);
+			oFile<<loan<<" "<<annualRate<<" "<<timeYears;
+
+			if ( !oFile ) {
+				cerr << "File could not be opened.\n";	//close program if error
+				exit(1);
+			}
+
+			oFile.close();
+		}
+	}
+
+
+
+	//calculate monthly payment, total payment, round monthly payment
+	timeMonths= timeYears*12;
+	monthlyRate= annualRate/12;
+
+	a= 1 + monthlyRate;
+	b= pow( a, timeMonths);
+	a= b - 1;
+	a= a / b;
+	a= a / monthlyRate;
+	monthlyPayment= loan / a;
+
+	totalPayment= monthlyPayment * timeMonths;
+
+	monthlyPayment = monthlyPayment + .005;
+	monthlyPayment *= 100;
+	monthlyPayment = int(monthlyPayment);
+	monthlyPayment = monthlyPayment/100;
+
+	//initialize for while loop, setup table
+	balance = loan;
+
+	cout<<"Loan amount: "<<loan
+		<<"\nAnnual Rate: "<<annualRate
+		<<"\nTime in Years: "<<timeYears;
+	cout<<"\n********************************************************************************";
+	cout<< "\nPayment \tPayment \tInterest \tApplied \tNew Balance ";
+	cout<< "\nNumber \t\tAmount \t\tAmount \t\tto principal \tAmount " <<endl;
+
+
+
+	//output
+	while( timeMonths > 0){
+
+		if( timeMonths == 1){	//final payment adjustments
+			payNum = payNum++;
+			interest = monthlyRate * balance;
+
+			interest = interest + .005;
+			interest *= 100;
+			interest = int(interest);
+			interest = interest/100;
+
+			monthlyPayment = balance + interest;
+
+			monthlyPayment = monthlyPayment + .005;
+			monthlyPayment *= 100;
+			monthlyPayment = int(monthlyPayment);
+			monthlyPayment = monthlyPayment/100;
+
+			balance = balance - monthlyPayment + interest;	
+			if( balance < 0)	//balance will appear 0 if interest is rounded down
+				balance = 0;
+
+			appliedPay = monthlyPayment - interest;
+		}
+
+		else{
+			payNum = payNum++;
+			interest = monthlyRate * balance;
+			balance = balance - monthlyPayment + interest;
+			appliedPay = monthlyPayment - interest;
+
+			interest = interest + .005;
+			interest *= 100;
+			interest = int(interest);
+			interest = interest/100;
+
+			balance = balance + .005;
+			balance *= 100;
+			balance = int(balance);
+			balance = balance/100;
+		}
+
+		//rounds numbers before printing to sreen
+		cout<<setprecision(2)<<setiosflags( ios::fixed | ios::showpoint )
+			<<payNum<< "\t\t" <<monthlyPayment<< "\t\t" <<interest<< "\t\t" <<appliedPay
+			<< "\t\t" <<balance;
+
+		cout<<endl;
+		timeMonths = timeMonths--;	//control
+	}//end of while loop
+	
+	//pause program
+	cout<<"\n\nenter any integer when done: ";
+	cin>>done;
+
+	return 0;
+}
+
+void addFile();
+
+
+
